@@ -21,7 +21,7 @@ interface ListState {
   search: string;
 }
 
-class List extends React.PureComponent<ListProps, ListState> {
+class ListOrder extends React.PureComponent<ListProps, ListState> {
   constructor(props: ListProps) {
     super(props);
 
@@ -48,8 +48,6 @@ class List extends React.PureComponent<ListProps, ListState> {
 
   render() {
     const { user, orders, isLoading, searchOrders } = this.props;
-    console.log('orders', user, orders);
-    
     const { search } = this.state;
 
     const filteredOrders = search
@@ -102,4 +100,4 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-export default connect(mapStateToProps, actions)(List);
+export default connect(mapStateToProps, actions)(ListOrder);

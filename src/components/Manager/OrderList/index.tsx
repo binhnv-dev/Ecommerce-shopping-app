@@ -46,7 +46,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
         <TouchableOpacity
           key={index}
           style={styles.orderBox}
-          onPress={() => navigation.navigate('OrderDetails', { orderId: order._id })}
+          onPress={() => navigation.navigate('OrderDetails', { id: order._id })}
         >
           <View style={styles.orderContainer}>
             <View style={styles.orderFirstItem}>{renderFirstItem(order)}</View>

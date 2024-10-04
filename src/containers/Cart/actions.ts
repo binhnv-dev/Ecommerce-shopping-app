@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux';
-import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   HANDLE_CART,
   ADD_TO_CART,
@@ -20,6 +19,8 @@ import { allFieldsValidation } from '../../utils/validation';
 import * as yup from 'yup';
 import { navigate } from '../../helpers/navigation';
 import { showMessage } from 'react-native-flash-message';
+import axiosInstance from '../../services/axios';
+
 
 interface Product {
   _id: string;
@@ -115,12 +116,12 @@ export const calculateCartTotal = () => {
 };
 
 // set cart store from cookie
-export const handleCart = () => {
+export const handleCart = async () => {
   const cart = {
-    cartItems: JSON.parse(localStorage.getItem('cart_items') || '[]'),
-    itemsInCart: JSON.parse(localStorage.getItem('items_in_cart') || '[]'),
-    cartTotal: localStorage.getItem('cart_total'),
-    cartId: localStorage.getItem('cart_id'),
+    cartItems: JSON.parse(await AsyncStorage.getItem('cart_items') || '[]'),
+    itemsInCart: JSON.parse(await AsyncStorage.getItem('items_in_cart') || '[]'),
+    cartTotal: AsyncStorage.getItem('cart_total'),
+    cartId: AsyncStorage.getItem('cart_id'),
   };
 
   return (dispatch: Dispatch, getState: any) => {
@@ -154,12 +155,12 @@ export const handleShopping = () => {
 export const getCartId = () => {
   return async (dispatch: Dispatch, getState: any) => {
     try {
-      const cartId = localStorage.getItem('cart_id');
+      const cartId = await AsyncStorage.getItem('cart_id');
       const cartItems = getState().cart.cartItems;
       const products = getCartItems(cartItems);
 
       if (!cartId) {
-        const response = await axios.post(`/api/cart/add`, { products });
+        const response = await axiosInstance.post(`/api/cart/add`, { products });
 
         dispatch(setCartId(response.data.cartId) as any);
       }
@@ -180,13 +181,15 @@ export const setCartId = (cartId: string) => {
 
 export const clearCart = () => {
   return (dispatch: Dispatch, getState: any) => {
-    localStorage.removeItem('cart_items');
-    localStorage.removeItem('items_in_cart');
-    localStorage.removeItem('cart_total');
-    localStorage.removeItem('cart_id');
-
-    dispatch({
-      type: CLEAR_CART,
+    Promise.all([
+      AsyncStorage.removeItem('cart_items'),
+      AsyncStorage.removeItem('items_in_cart'),
+      AsyncStorage.removeItem('cart_total'),
+      AsyncStorage.removeItem('cart_id'),
+    ]).then(() => {
+        dispatch({
+            type: CLEAR_CART,
+        });
     });
   };
 };

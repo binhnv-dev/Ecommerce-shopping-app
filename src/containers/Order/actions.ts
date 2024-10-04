@@ -1,6 +1,5 @@
 import {ThunkAction} from 'redux-thunk';
 import {AnyAction} from 'redux';
-import axios from 'axios';
 
 import {
   FETCH_ORDERS,
@@ -16,6 +15,8 @@ import {clearCart, getCartId} from '../Cart/actions';
 import handleError from '../../utils/error';
 import {navigate} from '../../helpers/navigation';
 import {showMessage} from 'react-native-flash-message';
+import axiosInstance from '../../services/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ThunkResult<R> = ThunkAction<R, any, undefined, AnyAction>;
 
@@ -38,7 +39,7 @@ export const fetchOrders = (): ThunkResult<void> => {
     try {
       dispatch(setOrderLoading(true));
 
-      const response = await axios.get(`/api/order`);
+      const response = await axiosInstance.get(`/api/order`);
 
       if (response.data.orders) {
         dispatch({
@@ -60,7 +61,7 @@ export const fetchCustomerOrders = (): ThunkResult<void> => {
     try {
       dispatch(setOrderLoading(true));
 
-      const response = await axios.get(`/api/order/customer`);
+      const response = await axiosInstance.get(`/api/order/customer`);
       if (response.data.orders) {
         dispatch({
           type: FETCH_CUSTOMER_ORDERS,
@@ -81,7 +82,7 @@ export const fetchSearchOrders = (filter: any): ThunkResult<void> => {
     try {
       dispatch(setOrderLoading(true));
 
-      const response = await axios.get(`/api/order/search`, {
+      const response = await axiosInstance.get(`/api/order/search`, {
         params: {
           search: filter.value,
         },
@@ -116,7 +117,7 @@ export const fetchOrder = (
         dispatch(setOrderLoading(true));
       }
 
-      const response = await axios.get(`/api/order/${id}`);
+      const response = await axiosInstance.get(`/api/order/${id}`);
 
       dispatch({
         type: FETCH_ORDER,
@@ -137,7 +138,7 @@ export const cancelOrder = (): ThunkResult<void> => {
     try {
       const order = getState().order.order;
 
-      await axios.delete(`/api/order/cancel/${order._id}`);
+      await axiosInstance.delete(`/api/order/cancel/${order._id}`);
 
       navigate('Orders');
     } catch (error: any) {
@@ -154,7 +155,7 @@ export const updateOrderItemStatus = (
     try {
       const order = getState().order.order;
 
-      const response = await axios.put(`/api/order/status/item/${itemId}`, {
+      const response = await axiosInstance.put(`/api/order/status/item/${itemId}`, {
         orderId: order._id,
         cartId: order.cartId,
         status,
@@ -177,10 +178,10 @@ export const updateOrderItemStatus = (
 export const addOrder = (): ThunkResult<void> => {
   return async (dispatch, getState) => {
     try {
-      const cartId = localStorage.getItem('cart_id');
+      const cartId = await AsyncStorage.getItem('cart_id');
       const total = getState().cart.cartTotal;
       if (cartId) {
-        const response = await axios.post(`/api/order/add`, {
+        const response = await axiosInstance.post(`/api/order/add`, {
           cartId,
           total,
         });
@@ -194,8 +195,8 @@ export const addOrder = (): ThunkResult<void> => {
 };
 
 export const placeOrder = (): ThunkResult<void> => {
-  return (dispatch, getState) => {
-    const token = localStorage.getItem('token');
+  return async (dispatch, getState) => {
+    const token = await AsyncStorage.getItem('token');
 
     const cartItems = getState().cart.cartItems;
 
@@ -215,6 +216,34 @@ export const placeOrder = (): ThunkResult<void> => {
   };
 };
 
+export const paidOrderMobileSuccess = (
+    order: any,
+    type: string,
+    amount: number,
+  ): ThunkResult<void> => {
+    return async dispatch => {
+      try {
+        const response = await axiosInstance.post('/api/payment/mobile/success', {
+          userId: order?.user,
+          productId: order.products[0]._id,
+          orderId: order._id,
+          provider: type,
+          amount,
+        });
+  
+        if (response.data) {
+          dispatch(fetchOrder(order._id, false));
+          showMessage({
+            message: `${response.data.message}`,
+            type: 'success',
+          });
+        }
+      } catch (error: any) {
+        handleError(error, dispatch);
+      }
+    };
+  };
+
 export const paidOrderSuccess = (
   order: any,
   data: any,
@@ -224,7 +253,7 @@ export const paidOrderSuccess = (
 ): ThunkResult<void> => {
   return async dispatch => {
     try {
-      const response = await axios.post('/api/payment/success', {
+      const response = await axiosInstance.post('/api/payment/success', {
         userId: order?.user,
         productId: order.products[0]._id,
         orderId: order._id,

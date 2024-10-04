@@ -19,7 +19,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from 'react-native-elements';
 import { navigationRef } from './src/helpers/navigation';
 import Profile from './src/containers/Profile';
-import List from './src/components/Store/ProductReviews/List';
+import List from './src/containers/Order';
+import OrderPage from './src/containers/OrderPage';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -111,6 +112,7 @@ const App: React.FC = () => (
           />
           <Stack.Screen name="Cart" component={Cart as any} />
           <Stack.Screen name="Orders" component={List as any} />
+          <Stack.Screen name="OrderDetails" component={OrderPage as any} />
           <Stack.Screen
             name="*"
             component={Page404}
