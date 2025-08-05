@@ -1,7 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { connect } from 'react-redux';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import {connect} from 'react-redux';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 
 import actions from '../../actions';
 import SubPage from '../../components/Manager/SubPage';
@@ -15,6 +21,7 @@ interface ListProps {
   user: any;
   orders: any[];
   isLoading: boolean;
+  authenticated: boolean;
 }
 
 interface ListState {
@@ -34,7 +41,7 @@ class ListOrder extends React.PureComponent<ListProps, ListState> {
     this.props.fetchOrders();
   }
 
-  handleOrderSearch = (e: { value: string }) => {
+  handleOrderSearch = (e: {value: string}) => {
     if (e.value.length >= 2) {
       this.setState({
         search: e.value,
@@ -47,33 +54,43 @@ class ListOrder extends React.PureComponent<ListProps, ListState> {
   };
 
   render() {
-    const { user, orders, isLoading, searchOrders } = this.props;
-    const { search } = this.state;
+    const {user, orders, isLoading, searchOrders, authenticated} = this.props;
+    const {search} = this.state;
 
     const filteredOrders = search
-      ? orders.filter((o) => o._id.includes(search))
+      ? orders.filter(o => o._id.includes(search))
       : orders;
 
     return (
       <ScrollView style={styles.container}>
         <SubPage
           title="Your Orders"
-          actionTitle={user.role === 'ROLE_ADMIN' ? 'Customer Orders' : undefined}
-          handleAction={() =>
-            user.role === 'ROLE_ADMIN' && useNavigation<NavigationProp<any>>().navigate('CustomerOrders')
+          actionTitle={
+            user.role === 'ROLE_ADMIN' ? 'Customer Orders' : undefined
           }
-        >
-          <OrderSearch
-            onBlur={this.handleOrderSearch}
-            onSearch={this.handleOrderSearch}
-            onSearchSubmit={searchOrders}
-          />
-          {isLoading ? (
-            <ActivityIndicator style={styles.loadingIndicator} />
-          ) : orders.length > 0 ? (
-            <OrderList orders={filteredOrders} />
+          handleAction={() =>
+            user.role === 'ROLE_ADMIN' &&
+            useNavigation<NavigationProp<any>>().navigate('CustomerOrders')
+          }>
+          {authenticated ? (
+            <>
+              <OrderSearch
+                onBlur={this.handleOrderSearch}
+                onSearch={this.handleOrderSearch}
+                onSearchSubmit={searchOrders}
+              />
+              {isLoading ? (
+                <ActivityIndicator style={styles.loadingIndicator} />
+              ) : orders.length > 0 ? (
+                <OrderList orders={filteredOrders} />
+              ) : (
+                <NotFound message="You have no orders yet!" />
+              )}
+            </>
           ) : (
-            <NotFound message="You have no orders yet!" />
+            <View>
+              <Text>You need to Sign In to new the orders.</Text>
+            </View>
           )}
         </SubPage>
       </ScrollView>
@@ -94,6 +111,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: any) => {
   return {
+    authenticated: state.authentication.authenticated,
     user: state.account.user,
     orders: state.order.orders,
     isLoading: state.order.isLoading,

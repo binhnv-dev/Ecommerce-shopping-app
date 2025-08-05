@@ -15,6 +15,7 @@ interface OrderPageProps {
   order: any;
   user: any;
   isLoading: boolean;
+  authenticated: boolean;
   cancelOrder: () => void;
   updateOrderItemStatus: (itemId: string, status: string) => void;
   paidOrderSuccess: (
@@ -50,6 +51,7 @@ class OrderPage extends React.PureComponent<OrderPageProps> {
       updateOrderItemStatus,
       paidOrderSuccess,
       paidOrderMobileSuccess,
+      authenticated,
     } = this.props;
 
     return (
@@ -60,6 +62,7 @@ class OrderPage extends React.PureComponent<OrderPageProps> {
           <OrderDetails
             order={order}
             user={user}
+            authentication={authenticated}
             cancelOrder={cancelOrder}
             updateOrderItemStatus={updateOrderItemStatus}
             paidOrderSuccess={paidOrderSuccess}
@@ -90,6 +93,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: any) => {
   return {
+    authenticated: state.authentication.authenticated,
     user: state.account.user,
     order: state.order.order,
     isLoading: state.order.isLoading,

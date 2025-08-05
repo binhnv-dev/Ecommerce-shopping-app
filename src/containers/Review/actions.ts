@@ -1,5 +1,5 @@
-import { Dispatch } from 'redux';
-import { showMessage } from 'react-native-flash-message';
+import {Dispatch} from 'redux';
+import {showMessage} from 'react-native-flash-message';
 import * as yup from 'yup';
 
 import {
@@ -10,10 +10,10 @@ import {
   FETCH_PRODUCT_REVIEWS,
   REVIEW_CHANGE,
   RESET_REVIEW,
-  SET_REVIEW_FORM_ERRORS
+  SET_REVIEW_FORM_ERRORS,
 } from './constants';
 import handleError from '../../utils/error';
-import { allFieldsValidation } from '../../utils/validation';
+import {allFieldsValidation} from '../../utils/validation';
 import axiosInstance from '../../services/axios';
 
 interface Review {
@@ -25,18 +25,18 @@ interface Review {
 }
 
 interface ReviewSummary {
-  ratingSummary: { [key: number]: number }[];
+  ratingSummary: {[key: number]: number}[];
   totalRatings: number;
   totalReviews: number;
   totalSummary: number;
 }
 
 export const reviewChange = (name: string, value: any) => {
-  let formData: { [key: string]: any } = {};
+  let formData: {[key: string]: any} = {};
   formData[name] = value;
   return {
     type: REVIEW_CHANGE,
-    payload: formData
+    payload: formData,
   };
 };
 
@@ -44,15 +44,15 @@ export const reviewChange = (name: string, value: any) => {
 export const fetchReviews = (): any => {
   return async (dispatch: Dispatch) => {
     try {
-      dispatch({ type: SET_REVIEWS_LOADING, payload: true });
+      dispatch({type: SET_REVIEWS_LOADING, payload: true});
 
       const response = await axiosInstance.get(`/api/review`);
 
-      dispatch({ type: FETCH_REVIEWS, payload: response.data.reviews });
+      dispatch({type: FETCH_REVIEWS, payload: response.data.reviews});
     } catch (error: any) {
       handleError(error, dispatch);
     } finally {
-      dispatch({ type: SET_REVIEWS_LOADING, payload: false });
+      dispatch({type: SET_REVIEWS_LOADING, payload: false});
     }
   };
 };
@@ -92,11 +92,11 @@ export const deleteReview = (id: string) => {
           message: response.data.message,
           type: 'success',
           position: 'top',
-          duration: 2000
+          duration: 2000,
         });
         dispatch({
           type: REMOVE_REVIEW,
-          payload: id
+          payload: id,
         });
       }
     } catch (error: any) {
@@ -111,12 +111,8 @@ export const fetchProductReviews = (slug: string): any => {
     try {
       const response = await axiosInstance.get(`/api/review/${slug}`);
 
-      const {
-        ratingSummary,
-        totalRatings,
-        totalReviews,
-        totalSummary
-      } = getProductReviewsSummary(response.data.reviews);
+      const {ratingSummary, totalRatings, totalReviews, totalSummary} =
+        getProductReviewsSummary(response.data.reviews);
 
       dispatch({
         type: FETCH_PRODUCT_REVIEWS,
@@ -126,9 +122,9 @@ export const fetchProductReviews = (slug: string): any => {
             ratingSummary,
             totalRatings,
             totalReviews,
-            totalSummary
-          }
-        }
+            totalSummary,
+          },
+        },
       });
     } catch (error: any) {
       handleError(error, dispatch);
@@ -137,11 +133,11 @@ export const fetchProductReviews = (slug: string): any => {
 };
 
 const addReviewSchema = yup.object().shape({
-    title: yup.string().required('Title is required.'),
-    review: yup.string().required('Review is required.'),
-    rating: yup.number().required('Rating is required.').min(1),
-    isRecommended: yup.boolean().required('Recommendable is required.')
-  });
+  title: yup.string().required('Title is required.'),
+  review: yup.string().required('Review is required.'),
+  rating: yup.number().required('Rating is required.').min(1),
+  isRecommended: yup.boolean().optional(),
+});
 
 export const addProductReview = () => {
   return async (dispatch: Dispatch, getState: any) => {
@@ -154,13 +150,16 @@ export const addProductReview = () => {
         isRecommended: review.isRecommended.value,
         rating: review.rating,
         review: review.review,
-        title: review.title
+        title: review.title,
       };
 
-      const { isValid, errors } = await allFieldsValidation(newReview, addReviewSchema);
+      const {isValid, errors} = await allFieldsValidation(
+        newReview,
+        addReviewSchema,
+      );
 
       if (!isValid) {
-        return dispatch({ type: SET_REVIEW_FORM_ERRORS, payload: errors });
+        return dispatch({type: SET_REVIEW_FORM_ERRORS, payload: errors});
       }
 
       const response = await axiosInstance.post(`/api/review/add`, newReview);
@@ -170,10 +169,10 @@ export const addProductReview = () => {
           message: response.data.message,
           type: 'success',
           position: 'top',
-          duration: 2000
+          duration: 2000,
         });
         dispatch(fetchProductReviews(product.slug));
-        dispatch({ type: RESET_REVIEW });
+        dispatch({type: RESET_REVIEW});
       }
     } catch (error: any) {
       handleError(error, dispatch);
@@ -182,13 +181,13 @@ export const addProductReview = () => {
 };
 
 export const getProductReviewsSummary = (reviews: Review[]): ReviewSummary => {
-  let ratingSummary: any = [{ 5: 0 }, { 4: 0 }, { 3: 0 }, { 2: 0 }, { 1: 0 }];
+  let ratingSummary: any = [{5: 0}, {4: 0}, {3: 0}, {2: 0}, {1: 0}];
   let totalRatings = 0;
   let totalReviews = 0;
   let totalSummary = 0;
 
   if (reviews.length > 0) {
-    reviews.forEach((item) => {
+    reviews.forEach(item => {
       totalRatings += item.rating;
       totalReviews += 1;
 
@@ -219,5 +218,5 @@ export const getProductReviewsSummary = (reviews: Review[]): ReviewSummary => {
     });
   }
 
-  return { ratingSummary, totalRatings, totalReviews, totalSummary };
+  return {ratingSummary, totalRatings, totalReviews, totalSummary};
 };

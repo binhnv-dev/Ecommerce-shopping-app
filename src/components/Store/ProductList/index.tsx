@@ -1,10 +1,18 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 import AddToWishList from '../AddToWishList';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../../../App';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '../../../../App';
 
 interface Product {
   slug: string;
@@ -33,9 +41,13 @@ type ProductScreenNavigationProp = StackNavigationProp<
   'Product'
 >;
 
-const ProductList: React.FC<ProductListProps> = ({ products, updateWishlist, authenticated }) => {
+const ProductList: React.FC<ProductListProps> = ({
+  products,
+  updateWishlist,
+  authenticated,
+}) => {
   const navigation = useNavigation<ProductScreenNavigationProp>();
-  const renderItem = ({ item: product }: { item: Product }) => (
+  const renderItem = ({item: product}: {item: Product}) => (
     <View style={styles.productContainer}>
       <View style={styles.itemBox}>
         <View style={styles.addWishlistBox}>
@@ -48,14 +60,15 @@ const ProductList: React.FC<ProductListProps> = ({ products, updateWishlist, aut
 
         <TouchableOpacity
           style={styles.itemLink}
-          onPress={() => navigation.navigate('Product', { slug: product.slug } )}
-        >
+          onPress={() => navigation.navigate('Product', {slug: product.slug})}>
           <View style={styles.itemImageContainer}>
             <View style={styles.itemImageBox}>
               <Image
                 style={styles.itemImage}
                 source={{
-                  uri: product.imageUrl ? product.imageUrl : 'https://via.placeholder.com/150',
+                  uri: product.imageUrl
+                    ? product.imageUrl
+                    : 'https://via.placeholder.com/150',
                 }}
               />
             </View>
@@ -75,7 +88,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, updateWishlist, aut
             <Text style={styles.price}>${product.price}</Text>
             {product.totalReviews > 0 && (
               <Text style={styles.reviews}>
-                <Text style={styles.rating}>{parseFloat(product.averageRating.toString()).toFixed(1)}</Text>
+                <Text style={styles.rating}>
+                  {parseFloat(product.averageRating.toString()).toFixed(1)}
+                </Text>
                 <Text style={styles.star}>★</Text>
               </Text>
             )}
@@ -89,13 +104,13 @@ const ProductList: React.FC<ProductListProps> = ({ products, updateWishlist, aut
     <FlatList
       data={products}
       renderItem={renderItem}
-      keyExtractor={(item) => item._id}
+      keyExtractor={item => item._id}
       contentContainerStyle={styles.productList}
     />
   );
 };
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   productList: {
@@ -107,7 +122,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
@@ -130,7 +145,7 @@ const styles = StyleSheet.create({
   itemImageContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 120,
+    height: 200,
     backgroundColor: '#f5f5f5',
   },
   itemImageBox: {

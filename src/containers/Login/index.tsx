@@ -4,13 +4,20 @@
  *
  */
 
-import React, { useCallback, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { connect } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import React, {useCallback, useEffect} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from 'react-native';
+import {connect} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 import actions from '../../actions';
 import LoadingIndicator from '../../components/Common/LoadingIndicator';
-import { debounce } from 'lodash';
+import {debounce} from 'lodash';
 
 interface Props {
   authenticated: boolean;
@@ -52,53 +59,59 @@ const Login: React.FC<Props> = ({
     debounce((name: string, value: string) => {
       loginChange(name, value);
     }, 300),
-    []
+    [],
   );
 
   return (
     <View style={styles.container}>
       {isLoading && <LoadingIndicator />}
-      <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
+      <Image
+        source={require('../../assets/images/logo.png')}
+        style={styles.logo}
+      />
       <Text style={styles.title}>Login</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="Email Address"
-          onChangeText={(value) => debouncedChangeHandler('email', value)}
+          onChangeText={value => debouncedChangeHandler('email', value)}
           autoCapitalize="none"
           keyboardType="email-address"
           placeholderTextColor="#888"
         />
-        {formErrors['email'] && <Text style={styles.error}>{formErrors['email']}</Text>}
+        {formErrors['email'] && (
+          <Text style={styles.error}>{formErrors['email']}</Text>
+        )}
         <TextInput
           style={styles.input}
           placeholder="Password"
-          onChangeText={(value) => debouncedChangeHandler('password', value)}
+          onChangeText={value => debouncedChangeHandler('password', value)}
           secureTextEntry
           placeholderTextColor="#888"
         />
-        {formErrors['password'] && <Text style={styles.error}>{formErrors['password']}</Text>}
+        {formErrors['password'] && (
+          <Text style={styles.error}>{formErrors['password']}</Text>
+        )}
       </View>
       {/* <SignupProvider /> */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, isSubmitting && styles.buttonDisabled]}
           onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          <Text style={styles.buttonText}>{isSubmitting ? 'Loading...' : 'Login'}</Text>
+          disabled={isSubmitting}>
+          <Text style={styles.buttonText}>
+            {isSubmitting ? 'Loading...' : 'Login'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.linkButton}
-          onPress={() => navigation.navigate('Register' as never)}
-        >
+          onPress={() => navigation.navigate('Register' as never)}>
           <Text style={styles.linkButtonText}>Create an account</Text>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
         style={styles.linkButton}
-        onPress={() => navigation.navigate('Forgot Password' as never)}
-      >
+        onPress={() => navigation.navigate('Forgot Password' as never)}>
         <Text style={styles.linkButtonText}>Forgot Password?</Text>
       </TouchableOpacity>
     </View>

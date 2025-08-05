@@ -155,11 +155,14 @@ export const updateOrderItemStatus = (
     try {
       const order = getState().order.order;
 
-      const response = await axiosInstance.put(`/api/order/status/item/${itemId}`, {
-        orderId: order._id,
-        cartId: order.cartId,
-        status,
-      });
+      const response = await axiosInstance.put(
+        `/api/order/status/item/${itemId}`,
+        {
+          orderId: order._id,
+          cartId: order.cartId,
+          status,
+        },
+      );
 
       if (response.data.orderCancelled) {
         navigate('Orders');
@@ -185,7 +188,7 @@ export const addOrder = (): ThunkResult<void> => {
           cartId,
           total,
         });
-        navigate(`OrderSuccess`, {orderId: response.data.order._id});
+        navigate(`OrderDetails`, {id: response.data.order._id});
         dispatch(clearCart());
       }
     } catch (error: any) {
@@ -217,32 +220,32 @@ export const placeOrder = (): ThunkResult<void> => {
 };
 
 export const paidOrderMobileSuccess = (
-    order: any,
-    type: string,
-    amount: number,
-  ): ThunkResult<void> => {
-    return async dispatch => {
-      try {
-        const response = await axiosInstance.post('/api/payment/mobile/success', {
-          userId: order?.user,
-          productId: order.products[0]._id,
-          orderId: order._id,
-          provider: type,
-          amount,
+  order: any,
+  type: string,
+  amount: number,
+): ThunkResult<void> => {
+  return async dispatch => {
+    try {
+      const response = await axiosInstance.post('/api/payment/mobile/success', {
+        userId: order?.user,
+        productId: order.products[0]._id,
+        orderId: order._id,
+        provider: type,
+        amount,
+      });
+
+      if (response.data) {
+        dispatch(fetchOrder(order._id, false));
+        showMessage({
+          message: `${response.data.message}`,
+          type: 'success',
         });
-  
-        if (response.data) {
-          dispatch(fetchOrder(order._id, false));
-          showMessage({
-            message: `${response.data.message}`,
-            type: 'success',
-          });
-        }
-      } catch (error: any) {
-        handleError(error, dispatch);
       }
-    };
+    } catch (error: any) {
+      handleError(error, dispatch);
+    }
   };
+};
 
 export const paidOrderSuccess = (
   order: any,

@@ -21,12 +21,14 @@ interface OrderDetailsProps {
     tokenId?: string | null,
   ) => void;
   onBack: () => void;
+  authentication: boolean;
   paidOrderMobileSuccess: (order: any, type: string, amount: number) => void;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({
   order,
   user,
+  authentication,
   cancelOrder,
   updateOrderItemStatus,
   paidOrderSuccess,
@@ -107,47 +109,60 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
 
   return (
     <ScrollView style={styles.container}>
-        
-      <View style={styles.row}>
-        <OrderMeta order={order} cancelOrder={cancelOrder} onBack={onBack} />
-      </View>
-      <View style={[styles.row]}>
-        <View style={styles.col8}>
-        {order.isPaid && (<View style={{marginBottom: 16}}>
-            <Text style={{textAlign: 'center', fontSize: 18, color: 'green'}}>
-                Order is Paid!
-            </Text>
-        </View>)}
-          <OrderItems
-            order={order}
-            user={user}
-            updateOrderItemStatus={updateOrderItemStatus}
-          />
-        </View>
-        
-        <View style={[styles.col4]}>
-          <OrderSummary order={order} />
-          {user?._id === order?.user && !order.isPaid && (
-            <View>
-              <StripeProvider publishableKey={apiKey}>
-                <ScrollView>
-                  <View style={styles.container}>
-                    <View style={styles.row}>
-                      <View style={styles.col8}>
-                        <Button
-                          title="Checkout With Credit Card"
-                          onPress={initializePaymentSheet}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
-              </StripeProvider>
+      {authentication ? (
+        <>
+          <View style={styles.row}>
+            <OrderMeta
+              order={order}
+              cancelOrder={cancelOrder}
+              onBack={onBack}
+            />
+          </View>
+          <View style={[styles.row]}>
+            <View style={styles.col8}>
+              {order.isPaid && (
+                <View style={{marginBottom: 16}}>
+                  <Text
+                    style={{textAlign: 'center', fontSize: 18, color: 'green'}}>
+                    Order is Paid!
+                  </Text>
+                </View>
+              )}
+              <OrderItems
+                order={order}
+                user={user}
+                updateOrderItemStatus={updateOrderItemStatus}
+              />
             </View>
-          )}
+
+            <View style={[styles.col4]}>
+              <OrderSummary order={order} />
+              {user?._id === order?.user && !order.isPaid && (
+                <View>
+                  <StripeProvider publishableKey={apiKey}>
+                    <ScrollView>
+                      <View style={styles.container}>
+                        <View style={styles.row}>
+                          <View style={styles.col8}>
+                            <Button
+                              title="Checkout With Credit Card"
+                              onPress={initializePaymentSheet}
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </ScrollView>
+                  </StripeProvider>
+                </View>
+              )}
+            </View>
+          </View>
+        </>
+      ) : (
+        <View>
+          <Text>You need to be Sign In to view the orders.</Text>
         </View>
-        
-      </View>
+      )}
     </ScrollView>
   );
 };

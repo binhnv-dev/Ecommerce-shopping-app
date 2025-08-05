@@ -144,7 +144,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     }
                     text="Remove From Bag"
                     className="bag-btn"
-                    icon={<BagIcon width={16} height={16} fill='#fff' />}
+                    icon={<BagIcon width={16} height={16} fill="#fff" />}
                     onClick={() => handleRemoveFromCart(product)}
                     style={styles.button}
                   />
@@ -156,7 +156,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
                     }
                     text="Add To Bag"
                     className="bag-btn"
-                    icon={<BagIcon width={16} height={16} fill='#fff' />}
+                    icon={<BagIcon width={16} height={16} fill="#fff" />}
                     onClick={() => handleAddToCart(product)}
                     style={styles.button}
                   />
@@ -180,6 +180,9 @@ const ProductPage: React.FC<ProductPageProps> = ({
 
 const styles = StyleSheet.create({
   productShop: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
     padding: 10,
   },
   row: {
@@ -187,6 +190,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   col: {
+    width: '100%',
     flex: 1,
     padding: 10,
   },
@@ -195,8 +199,7 @@ const styles = StyleSheet.create({
   },
   itemImage: {
     width: '100%',
-    height: 300,
-    resizeMode: 'cover',
+    minHeight: 300,
     borderRadius: 10,
     backgroundColor: '#333',
   },

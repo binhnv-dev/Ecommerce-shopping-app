@@ -5,8 +5,13 @@
  */
 
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
-import { HeartIcon } from '../../Common/Icon';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
+import {HeartIcon} from '../../Common/Icon';
 
 interface AddToWishListProps {
   product: {
@@ -19,27 +24,30 @@ interface AddToWishListProps {
   authenticated: boolean;
 }
 
-const AddToWishList: React.FC<AddToWishListProps> = ({ product, updateWishlist, authenticated }) => {
-  const { width, height } = useWindowDimensions();
+const AddToWishList: React.FC<AddToWishListProps> = ({
+  product,
+  updateWishlist,
+  authenticated,
+}) => {
+  const {width, height} = useWindowDimensions();
   const [checked, setChecked] = React.useState(!!product?.isLiked);
   const handleCheckboxChange = (e: any) => {
-    setChecked(!checked);
-
     const updatePayload = {
       checked: product?.isLiked ? false : true,
       id: product._id,
-      name: product.name
-    }
-    
+      name: product.name,
+    };
+
     updateWishlist(updatePayload);
-  }
+    if (!authenticated) return;
+    setChecked(!checked);
+  };
 
   return (
     <View style={styles.addToWishlist}>
       <TouchableOpacity
         onPress={handleCheckboxChange}
-        style={authenticated ? styles.checkbox : styles.disabledCheckbox}
-      >
+        style={authenticated ? styles.checkbox : styles.disabledCheckbox}>
         <HeartIcon filled={checked} />
       </TouchableOpacity>
     </View>
